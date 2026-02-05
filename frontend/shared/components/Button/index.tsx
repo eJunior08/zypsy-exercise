@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode, ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
 import { Heading1 } from "../Typography";
 
 type ButtonVariant = "primary" | "secondary";
@@ -17,7 +17,8 @@ export function Button({
   className = "",
   ...rest
 }: ButtonProps) {
-  const baseStyles = "rounded h-[40px] flex items-center justify-center gap-2";
+  const baseStyles =
+    "rounded h-[40px] flex items-center justify-center gap-2 cursor-pointer";
 
   const paddingStyles = icon
     ? "pl-[24px] pr-[16px] py-[8px]"
