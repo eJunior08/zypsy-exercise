@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 import { Sidebar } from "@/app/posts/components/layout/Sidebar";
 import { MobileMenu } from "@/app/posts/components/layout/MobileMenu";
 import { useCategories } from "@/app/posts/hooks/useCategories";
@@ -14,17 +14,31 @@ type PostsLayoutProps = {
 
 export default function PostsLayout({ children }: PostsLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const hasAutoSelectedRef = useRef(false);
 
   const { categories, loading: categoriesLoading, toggleFavorite } = useCategories();
   const { filterMode, setFilterMode, filteredCategories } = useCategoryFilter(categories);
   const { selectedCategoryId, selectCategory } = useSelectedCategory();
 
-  // Auto-select first category if none selected
+  // Auto-select first category on initial load
   useEffect(() => {
-    if (!selectedCategoryId && filteredCategories.length > 0) {
+    if (!hasAutoSelectedRef.current && !selectedCategoryId && filteredCategories.length > 0) {
       selectCategory(filteredCategories[0].id);
+      hasAutoSelectedRef.current = true;
     }
   }, [selectedCategoryId, filteredCategories, selectCategory]);
+
+  // When filter changes, ensure selected category is still valid
+  useEffect(() => {
+    if (selectedCategoryId && filteredCategories.length > 0) {
+      const isSelectedInFiltered = filteredCategories.some(
+        (cat) => cat.id === selectedCategoryId
+      );
+      if (!isSelectedInFiltered) {
+        selectCategory(filteredCategories[0].id);
+      }
+    }
+  }, [filteredCategories, selectedCategoryId, selectCategory]);
 
   if (categoriesLoading) {
     return (
